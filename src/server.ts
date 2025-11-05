@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
 import { DatabaseConfig } from './config/database';
+import { MySQLConfig } from './config/mysql';
 import { GameRoutes } from './routes/game.routes';
 import { AuthRoutes } from './routes/auth.routes';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
@@ -19,12 +20,14 @@ dotenv.config();
 class Server {
   private app: Application;
   private port: number;
-  private databaseConfig: DatabaseConfig;
+  private mongoConfig: DatabaseConfig;
+  private mysqlConfig: MySQLConfig;
 
   constructor() {
     this.app = express();
     this.port = parseInt(process.env.PORT || '3000');
-    this.databaseConfig = DatabaseConfig.getInstance();
+    this.mongoConfig = DatabaseConfig.getInstance();
+    this.mysqlConfig = MySQLConfig.getInstance();
     
     this.initializeMiddlewares();
     this.initializeRoutes();
@@ -92,7 +95,10 @@ class Server {
         success: true,
         message: 'API is running',
         timestamp: new Date().toISOString(),
-        database: this.databaseConfig.getConnectionStatus() ? 'connected' : 'disconnected'
+        databases: {
+          mongodb: this.mongoConfig.getConnectionStatus() ? 'connected' : 'disconnected',
+          mysql: this.mysqlConfig.getConnectionStatus() ? 'connected' : 'disconnected'
+        }
       });
     });
 
@@ -126,9 +132,34 @@ class Server {
    */
   public async start(): Promise<void> {
     try {
+      console.log('🔌 Connexion aux bases de données...');
+      
       // Connexion à MongoDB
       const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/gamedb';
-      await this.databaseConfig.connect(mongoUri);
+      await this.mongoConfig.connect(mongoUri);
+
+      // Connexion à MySQL
+      try {
+        await this.mysqlConfig.connect();
+        
+        // Initialiser les tables MySQL
+        console.log('📋 Initialisation des tables MySQL...');
+        
+        // Table users
+        const { UserMySQLModel } = await import('./models/User.mysql.model');
+        const userModel = new UserMySQLModel();
+        await userModel.initTable();
+        
+        // Table audit_logs
+        const { AuditLogService } = await import('./services/AuditLog.service');
+        const auditService = new AuditLogService();
+        await auditService.initTable();
+        
+        console.log('✅ Tables MySQL initialisées');
+      } catch (error) {
+        console.warn('⚠️  MySQL non disponible, certaines fonctionnalités seront limitées');
+        console.warn('   Vous pouvez continuer sans MySQL pour le développement');
+      }
 
       // Démarrage du serveur
       this.app.listen(this.port, () => {
@@ -137,6 +168,10 @@ class Server {
         console.log(`📚 Documentation: http://localhost:${this.port}`);
         console.log(`🏥 Health: http://localhost:${this.port}/health`);
         console.log(`🎮 API: http://localhost:${this.port}/api/games`);
+        console.log('=================================');
+        console.log('📊 Bases de données:');
+        console.log(`   🍃 MongoDB: ${this.mongoConfig.getConnectionStatus() ? '✅' : '❌'}`);
+        console.log(`   🐬 MySQL: ${this.mysqlConfig.getConnectionStatus() ? '✅' : '❌'}`);
         console.log('=================================');
       });
     } catch (error) {

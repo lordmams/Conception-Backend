@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../services/Auth.service';
+import { AuditLogService } from '../services/AuditLog.service';
 import { IRegisterData, ILoginData, UserRole } from '../types/auth.types';
 import { AuthRequest } from '../middlewares/auth.middleware';
 
@@ -8,9 +9,11 @@ import { AuthRequest } from '../middlewares/auth.middleware';
  */
 export class AuthController {
   private authService: AuthService;
+  private auditLogService: AuditLogService;
 
   constructor() {
     this.authService = new AuthService();
+    this.auditLogService = new AuditLogService();
   }
 
   /**
@@ -26,6 +29,15 @@ export class AuthController {
         return;
       }
 
+      // Logger l'inscription dans MySQL (audit)
+      await this.auditLogService.log({
+        user_id: result.user?.id,
+        action: 'REGISTER',
+        resource: 'auth',
+        details: { username: data.username, email: data.email },
+        ip_address: req.ip
+      });
+
       res.status(201).json(result);
     } catch (error) {
       next(error);
@@ -39,6 +51,15 @@ export class AuthController {
     try {
       const data: ILoginData = req.body;
       const result = await this.authService.login(data);
+
+      // Logger la tentative de connexion dans MySQL (audit)
+      await this.auditLogService.log({
+        user_id: result.user?.id,
+        action: result.success ? 'LOGIN_SUCCESS' : 'LOGIN_FAILED',
+        resource: 'auth',
+        details: { email: data.email },
+        ip_address: req.ip
+      });
 
       if (!result.success) {
         res.status(401).json(result);
@@ -130,32 +151,6 @@ export class AuthController {
       res.status(200).json({
         success: true,
         message: 'Rôle modifié avec succès',
-        data: user
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  /**
-   * PATCH /auth/users/:id/deactivate - Désactiver un utilisateur (admin seulement)
-   */
-  public deactivateUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const { id } = req.params;
-      const user = await this.authService.deactivateUser(id);
-
-      if (!user) {
-        res.status(404).json({
-          success: false,
-          message: 'Utilisateur non trouvé'
-        });
-        return;
-      }
-
-      res.status(200).json({
-        success: true,
-        message: 'Utilisateur désactivé avec succès',
         data: user
       });
     } catch (error) {

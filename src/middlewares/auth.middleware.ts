@@ -90,7 +90,7 @@ export const authorize = (roles: UserRole[]) => {
  */
 export const optionalAuthenticate = (
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void => {
   try {

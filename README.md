@@ -9,16 +9,37 @@ API REST complète et sécurisée pour gérer une collection de jeux vidéo avec
 ## 🚀 Démarrage Rapide
 
 ```bash
-# 1. Démarrer MongoDB et l'API
+# 1. Démarrer MongoDB, MySQL et l'API
 docker-compose up -d
 
-# 2. Vérifier que tout fonctionne
+# 2. Vérifier que tout fonctionne (les 2 bases de données)
 curl http://localhost:3000/health
 
 # 3. Accéder aux interfaces
 # Documentation Swagger: http://localhost:3000 (page d'accueil)
 # API Games: http://localhost:3000/api/games
-# Mongo Express: http://localhost:8082 (admin/admin123)
+# Mongo Express (MongoDB): http://localhost:8082 (admin/admin123)
+# phpMyAdmin (MySQL): http://localhost:8083 (root/root123)
+```
+
+### 🗂️ Architecture Hybride BDD
+
+Le projet utilise **2 bases de données simultanément** pour démontrer l'arbitrage SQL/NoSQL :
+
+```
+┌─────────────────────────────────────────────────┐
+│              Game API (Express)                  │
+├─────────────────────────────────────────────────┤
+│  🍃 MongoDB              🐬 MySQL                │
+│  ├─ games                ├─ users ───┐          │
+│  └─ (flexible)           ├─ audit_logs│          │
+│                          └────────────┘          │
+│                           (relation FK)          │
+└─────────────────────────────────────────────────┘
+
+📊 Répartition des données :
+• MongoDB → Jeux (structure variable selon genre)
+• MySQL   → Users + Audit Logs (structure fixe, relations)
 ```
 
 ---
@@ -314,10 +335,12 @@ game-api/
 - ✅ **Documentation Swagger** interactive
 
 ### 🗄️ Base de données
-- ✅ **Architecture hybride** : MongoDB (NoSQL) + MySQL (SQL)
-- ✅ **MongoDB** avec Mongoose pour les jeux
-- ✅ **MySQL** prêt pour les données relationnelles
-- ✅ **Index** pour la performance
+- ✅ **Architecture hybride** : MongoDB (NoSQL) + MySQL (SQL) avec **connexion double simultanée**
+- ✅ **MongoDB** avec Mongoose pour les **jeux** (données flexibles, schéma variable)
+- ✅ **MySQL** pour les **utilisateurs** et **logs d'audit** (données structurées, relations SQL)
+- ✅ **Relations SQL** : Clé étrangère entre `users` et `audit_logs`
+- ✅ **Exemple concret** : Games dans MongoDB + Users/Auth dans MySQL + Logs d'audit reliés
+- ✅ **Index** pour la performance sur les deux BDD
 - ✅ **Sauvegardes automatiques** MongoDB
 - ✅ **Interfaces graphiques** : Mongo Express + phpMyAdmin
 
@@ -338,9 +361,10 @@ game-api/
 ## 📚 Documentation Complète
 
 ### 📖 Pour les étudiants
-- **[README_PEDAGOGIQUE.md](documentation/README_PEDAGOGIQUE.md)** - Guide complet pour apprendre (architecture, concepts, exercices)
-- **[ARBITRAGE_SQL_NOSQL.md](documentation/ARBITRAGE_SQL_NOSQL.md)** - Quand utiliser SQL vs NoSQL avec exemples
 - **[DEMARRAGE_RAPIDE.md](documentation/DEMARRAGE_RAPIDE.md)** - Guide de démarrage en 5 minutes
+- **[README_PEDAGOGIQUE.md](documentation/README_PEDAGOGIQUE.md)** - Guide complet pour apprendre (architecture, concepts, exercices)
+- **[PROJETS_ETUDIANTS.md](documentation/PROJETS_ETUDIANTS.md)** - 🆕 5 projets pratiques progressifs
+- **[ARBITRAGE_SQL_NOSQL.md](documentation/ARBITRAGE_SQL_NOSQL.md)** - Quand utiliser SQL vs NoSQL avec exemples
 
 ### 🔧 Documentation technique
 - **[MYSQL_SETUP.md](documentation/MYSQL_SETUP.md)** - 🆕 Configuration et utilisation de MySQL
@@ -389,13 +413,20 @@ Ce projet est conçu pour l'apprentissage du développement back-end conforméme
 
 Voir **[README_PEDAGOGIQUE.md](documentation/README_PEDAGOGIQUE.md)** pour les détails et la grille d'évaluation.
 
-### 🎯 Exercices pratiques
+### 🎯 Exercices et projets pratiques
 
-Le guide pédagogique inclut des exercices de difficulté progressive :
+**4 exercices progressifs** (dans le guide pédagogique) :
 - ✏️ **Débutant** : Ajouter un champ au modèle
 - 📊 **Intermédiaire** : Créer un endpoint de statistiques
 - ⭐ **Avancé** : Système de favoris utilisateur
 - 🚀 **Expert** : Implémenter un cache Redis
+
+**5 projets complets** (dans [PROJETS_ETUDIANTS.md](documentation/PROJETS_ETUDIANTS.md)) :
+1. 💬 **Système de Commentaires** (8h - Débutant)
+2. ⭐ **Favoris et Wishlist** (12h - Intermédiaire)
+3. 📝 **Reviews et Ratings** (16h - Avancé)
+4. 📊 **Dashboard Admin** (20h - Expert)
+5. 🏢 **API Multi-tenant** (40h - Professionnel)
 
 ### 📚 Ressources d'apprentissage
 

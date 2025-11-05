@@ -201,33 +201,6 @@ export class AuthRoutes {
       authorize([UserRole.ADMIN]),
       this.authController.changeUserRole
     );
-
-    /**
-     * @swagger
-     * /api/auth/users/{id}/deactivate:
-     *   patch:
-     *     summary: Désactiver un utilisateur (admin seulement)
-     *     tags: [Authentication]
-     *     security:
-     *       - bearerAuth: []
-     *     parameters:
-     *       - in: path
-     *         name: id
-     *         required: true
-     *         schema:
-     *           type: string
-     *     responses:
-     *       200:
-     *         description: Utilisateur désactivé
-     *       403:
-     *         description: Permissions insuffisantes
-     */
-    this.router.patch(
-      '/users/:id/deactivate',
-      authenticate,
-      authorize([UserRole.ADMIN]),
-      this.authController.deactivateUser
-    );
   }
 
   /**

@@ -1,18 +1,24 @@
-import { UserModel } from '../models/User.model';
+import { UserMySQLModel } from '../models/User.mysql.model';
 import { IRegisterData, ILoginData, IAuthResponse, UserRole } from '../types/auth.types';
 import { generateToken } from '../utils/jwt.utils';
 
 /**
  * Service pour la gestion de l'authentification
+ * Utilise MySQL pour stocker les utilisateurs (données structurées)
  */
 export class AuthService {
+  private userModel: UserMySQLModel;
+
+  constructor() {
+    this.userModel = new UserMySQLModel();
+  }
   /**
    * Inscription d'un nouvel utilisateur
    */
   public async register(data: IRegisterData): Promise<IAuthResponse> {
     try {
       // Vérifier si l'email existe déjà
-      const existingUserByEmail = await UserModel.findOne({ email: data.email });
+      const existingUserByEmail = await this.userModel.findByEmail(data.email);
       if (existingUserByEmail) {
         return {
           success: false,
@@ -21,7 +27,7 @@ export class AuthService {
       }
 
       // Vérifier si le nom d'utilisateur existe déjà
-      const existingUserByUsername = await UserModel.findOne({ username: data.username });
+      const existingUserByUsername = await this.userModel.findByUsername(data.username);
       if (existingUserByUsername) {
         return {
           success: false,
@@ -29,19 +35,17 @@ export class AuthService {
         };
       }
 
-      // Créer le nouvel utilisateur
-      const user = new UserModel({
+      // Créer le nouvel utilisateur dans MySQL
+      const user = await this.userModel.create({
         username: data.username,
         email: data.email,
         password: data.password,
         role: UserRole.USER // Rôle par défaut
       });
 
-      await user.save();
-
       // Générer le token JWT
       const token = generateToken({
-        userId: user._id.toString(),
+        userId: user.id!.toString(),
         email: user.email,
         role: user.role
       });
@@ -51,7 +55,7 @@ export class AuthService {
         message: 'Inscription réussie',
         token,
         user: {
-          id: user._id.toString(),
+          id: user.id!.toString(),
           username: user.username,
           email: user.email,
           role: user.role
@@ -59,7 +63,10 @@ export class AuthService {
       };
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`Erreur lors de l'inscription: ${error.message}`);
+        return {
+          success: false,
+          message: error.message.includes('existe déjà') ? error.message : 'Erreur lors de l\'inscription'
+        };
       }
       throw error;
     }
@@ -70,8 +77,8 @@ export class AuthService {
    */
   public async login(data: ILoginData): Promise<IAuthResponse> {
     try {
-      // Rechercher l'utilisateur par email (inclure le password)
-      const user = await UserModel.findOne({ email: data.email }).select('+password');
+      // Rechercher l'utilisateur par email avec son mot de passe
+      const user = await this.userModel.findByEmailWithPassword(data.email);
 
       if (!user) {
         return {
@@ -80,16 +87,8 @@ export class AuthService {
         };
       }
 
-      // Vérifier si le compte est actif
-      if (!user.isActive) {
-        return {
-          success: false,
-          message: 'Votre compte a été désactivé'
-        };
-      }
-
       // Vérifier le mot de passe
-      const isPasswordValid = await user.comparePassword(data.password);
+      const isPasswordValid = await this.userModel.comparePassword(data.password, user.password!);
 
       if (!isPasswordValid) {
         return {
@@ -100,7 +99,7 @@ export class AuthService {
 
       // Générer le token JWT
       const token = generateToken({
-        userId: user._id.toString(),
+        userId: user.id!.toString(),
         email: user.email,
         role: user.role
       });
@@ -110,7 +109,7 @@ export class AuthService {
         message: 'Connexion réussie',
         token,
         user: {
-          id: user._id.toString(),
+          id: user.id!.toString(),
           username: user.username,
           email: user.email,
           role: user.role
@@ -129,20 +128,19 @@ export class AuthService {
    */
   public async getProfile(userId: string) {
     try {
-      const user = await UserModel.findById(userId);
+      const user = await this.userModel.findById(parseInt(userId));
 
       if (!user) {
         return null;
       }
 
       return {
-        id: user._id.toString(),
+        id: user.id!.toString(),
         username: user.username,
         email: user.email,
         role: user.role,
-        isActive: user.isActive,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt
+        createdAt: user.created_at,
+        updatedAt: user.updated_at
       };
     } catch (error) {
       if (error instanceof Error) {
@@ -157,8 +155,15 @@ export class AuthService {
    */
   public async listUsers() {
     try {
-      const users = await UserModel.find().select('-password');
-      return users;
+      const users = await this.userModel.findAll();
+      return users.map(user => ({
+        id: user.id!.toString(),
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        createdAt: user.created_at,
+        updatedAt: user.updated_at
+      }));
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Erreur lors de la récupération des utilisateurs: ${error.message}`);
@@ -172,36 +177,19 @@ export class AuthService {
    */
   public async changeUserRole(userId: string, newRole: UserRole) {
     try {
-      const user = await UserModel.findByIdAndUpdate(
-        userId,
-        { role: newRole },
-        { new: true }
-      ).select('-password');
+      const user = await this.userModel.updateRole(parseInt(userId), newRole);
 
-      return user;
+      return {
+        id: user.id!.toString(),
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        createdAt: user.created_at,
+        updatedAt: user.updated_at
+      };
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Erreur lors du changement de rôle: ${error.message}`);
-      }
-      throw error;
-    }
-  }
-
-  /**
-   * Désactiver un utilisateur (admin seulement)
-   */
-  public async deactivateUser(userId: string) {
-    try {
-      const user = await UserModel.findByIdAndUpdate(
-        userId,
-        { isActive: false },
-        { new: true }
-      ).select('-password');
-
-      return user;
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(`Erreur lors de la désactivation: ${error.message}`);
       }
       throw error;
     }

@@ -38,11 +38,17 @@ Bienvenue dans la documentation complète du projet Game API !
 - Restauration des données
 - Commandes pratiques
 
-**[MYSQL_SETUP.md](MYSQL_SETUP.md)** - Utiliser MySQL 🆕
+**[MYSQL_SETUP.md](MYSQL_SETUP.md)** - Utiliser MySQL
 - Configuration MySQL
 - Schémas de base de données
 - Connexion depuis Node.js
 - Migration MongoDB → MySQL
+
+**[PROJETS_ETUDIANTS.md](PROJETS_ETUDIANTS.md)** - Projets pratiques 🆕
+- 5 projets progressifs (débutant → professionnel)
+- Énoncés complets avec livrables
+- Critères d'évaluation détaillés
+- Indices et corrections
 
 ---
 
@@ -94,10 +100,11 @@ Bienvenue dans la documentation complète du projet Game API !
 
 1. **[DEMARRAGE_RAPIDE.md](DEMARRAGE_RAPIDE.md)** - Premier contact avec l'API (5 min)
 2. **[README_PEDAGOGIQUE.md](README_PEDAGOGIQUE.md)** - Formation complète avec exercices
-3. **[ARBITRAGE_SQL_NOSQL.md](ARBITRAGE_SQL_NOSQL.md)** - Comprendre les choix de BDD
-4. **[MYSQL_SETUP.md](MYSQL_SETUP.md)** - 🆕 Utiliser MySQL dans le projet
-5. **[TESTING.md](TESTING.md)** - Stratégie de tests complète
-6. **[BACKUP.md](BACKUP.md)** - Système de sauvegarde MongoDB
+3. **[PROJETS_ETUDIANTS.md](PROJETS_ETUDIANTS.md)** - 🆕 Projets pratiques (5 niveaux)
+4. **[ARBITRAGE_SQL_NOSQL.md](ARBITRAGE_SQL_NOSQL.md)** - Comprendre les choix de BDD
+5. **[MYSQL_SETUP.md](MYSQL_SETUP.md)** - Utiliser MySQL dans le projet
+6. **[TESTING.md](TESTING.md)** - Stratégie de tests complète
+7. **[BACKUP.md](BACKUP.md)** - Système de sauvegarde MongoDB
 
 ---
 
@@ -115,9 +122,10 @@ Bienvenue dans la documentation complète du projet Game API !
 
 1. **Commencez par la pratique** : Suivez [DEMARRAGE_RAPIDE.md](DEMARRAGE_RAPIDE.md) pour voir l'API en action
 2. **Comprenez les concepts** : Lisez [README_PEDAGOGIQUE.md](README_PEDAGOGIQUE.md) pour comprendre l'architecture
-3. **Faites les exercices** : Pratiquez avec les 4 exercices progressifs
-4. **Testez votre code** : Apprenez à tester avec [TESTING.md](TESTING.md)
-5. **Expérimentez** : Modifiez le code, cassez-le, réparez-le !
+3. **Faites les exercices** : Suivez les 4 exercices du guide pédagogique
+4. **Réalisez les projets** : Progressez avec les 5 projets de [PROJETS_ETUDIANTS.md](PROJETS_ETUDIANTS.md)
+5. **Testez votre code** : Apprenez à tester avec [TESTING.md](TESTING.md)
+6. **Expérimentez** : Modifiez le code, cassez-le, réparez-le !
 
 ---
 
