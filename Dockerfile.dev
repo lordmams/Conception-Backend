@@ -1,0 +1,28 @@
+# Dockerfile pour le développement avec hot-reload
+FROM node:20-alpine
+
+# Installer wget pour les healthchecks
+RUN apk add --no-cache wget
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers de dépendances
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Installer toutes les dépendances (dev inclus)
+RUN npm install
+
+# Copier le code source
+COPY src ./src
+
+# Exposer le port
+EXPOSE 3000
+
+# Variable d'environnement
+ENV NODE_ENV=development
+
+# Commande de démarrage (avec hot-reload)
+CMD ["npm", "run", "dev"]
+

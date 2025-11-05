@@ -1,0 +1,42 @@
+FROM mongo:7.0
+
+# Installer les outils nécessaires
+RUN apt-get update && apt-get install -y \
+    cron \
+    tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
+# Créer les répertoires nécessaires
+RUN mkdir -p /scripts /backups
+
+# Copier les scripts de sauvegarde
+COPY scripts/backup.sh /scripts/backup.sh
+COPY scripts/restore.sh /scripts/restore.sh
+COPY scripts/backup-cron.sh /scripts/backup-cron.sh
+
+# Rendre les scripts exécutables
+RUN chmod +x /scripts/*.sh
+
+# Configuration du fuseau horaire (Europe/Paris par défaut)
+ENV TZ=Europe/Paris
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Créer le fichier crontab
+# Par défaut: sauvegarde tous les jours à 2h du matin
+RUN echo "0 2 * * * /scripts/backup-cron.sh" > /etc/cron.d/backup-cron && \
+    chmod 0644 /etc/cron.d/backup-cron && \
+    crontab /etc/cron.d/backup-cron
+
+# Créer un fichier de log
+RUN touch /var/log/cron.log
+
+# Script d'entrée pour démarrer cron et afficher les logs
+COPY scripts/backup-entrypoint.sh /scripts/backup-entrypoint.sh
+RUN chmod +x /scripts/backup-entrypoint.sh
+
+# Exposer le volume des backups
+VOLUME ["/backups"]
+
+# Commande par défaut
+CMD ["/scripts/backup-entrypoint.sh"]
+

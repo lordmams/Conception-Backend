@@ -1,0 +1,35 @@
+node_modules
+npm-debug.log
+dist
+.env
+.env.local
+.git
+.gitignore
+*.md
+.DS_Store
+.vscode
+.idea
+*.log
+coverage
+.nyc_output
+
+# Documentation (pas besoin dans l'image)
+00-LIRE-EN-PREMIER.md
+ARCHITECTURE.md
+DOCKER.md
+INDEX.md
+PROJECT_SUMMARY.md
+QUICKSTART.md
+README.md
+START.md
+
+# Tests et seeds
+seed.sh
+seed.example.json
+Game-API.postman_collection.json
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+

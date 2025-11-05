@@ -1,0 +1,66 @@
+# Makefile pour faciliter les commandes Docker
+
+.PHONY: help build up down restart logs ps clean seed test
+
+help: ## Affiche cette aide
+	@echo "Commandes disponibles:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+build: ## Construire les images Docker
+	docker-compose build
+
+up: ## Démarrer tous les services
+	docker-compose up -d
+
+up-build: ## Construire et démarrer tous les services
+	docker-compose up -d --build
+
+down: ## Arrêter tous les services
+	docker-compose down
+
+down-v: ## Arrêter tous les services et supprimer les volumes
+	docker-compose down -v
+
+restart: ## Redémarrer tous les services
+	docker-compose restart
+
+restart-api: ## Redémarrer uniquement l'API
+	docker-compose restart api
+
+logs: ## Afficher les logs de tous les services
+	docker-compose logs -f
+
+logs-api: ## Afficher les logs de l'API
+	docker-compose logs -f api
+
+logs-db: ## Afficher les logs de MongoDB
+	docker-compose logs -f mongodb
+
+ps: ## Afficher le statut des services
+	docker-compose ps
+
+clean: ## Nettoyer tout (conteneurs, volumes, images)
+	docker-compose down -v
+	docker system prune -af
+
+seed: ## Insérer des données de test
+	./seed.sh
+
+test: ## Tester l'API
+	curl http://localhost:3000/health
+	@echo ""
+	curl http://localhost:3000/api/games
+
+dev: ## Démarrer en mode développement
+	docker-compose -f docker-compose.dev.yml up -d --build
+
+dev-down: ## Arrêter le mode développement
+	docker-compose -f docker-compose.dev.yml down
+
+shell-api: ## Ouvrir un shell dans le conteneur API
+	docker exec -it gamedb-api sh
+
+shell-db: ## Ouvrir mongosh dans le conteneur MongoDB
+	docker exec -it gamedb-mongo mongosh gamedb
+
+
