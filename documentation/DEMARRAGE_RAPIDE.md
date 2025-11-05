@@ -143,11 +143,12 @@ curl -X PATCH http://localhost:3000/api/auth/users/USER_ID/role \
 
 ## 📊 Interfaces disponibles
 
-| Interface | URL | Identifiants |
-|-----------|-----|--------------|
-| **Swagger (API)** | http://localhost:3000 | Token JWT |
-| **Mongo Express** | http://localhost:8082 | admin / admin123 |
-| **API Health** | http://localhost:3000/health | - |
+| Interface | URL | Identifiants | Base |
+|-----------|-----|--------------|------|
+| **Swagger (API)** | http://localhost:3000 | Token JWT | - |
+| **Mongo Express** | http://localhost:8082 | admin / admin123 | MongoDB (NoSQL) |
+| **phpMyAdmin** | http://localhost:8083 | root / root123 | MySQL (SQL) |
+| **API Health** | http://localhost:3000/health | - | - |
 
 ---
 
@@ -250,12 +251,16 @@ docker-compose start
 
 ## ❓ Problèmes courants
 
-### "Connection refused" à MongoDB
+### "Connection refused" à MongoDB ou MySQL
 
-**Solution** : Attendez 30 secondes que MongoDB démarre.
+**Solution** : Attendez 30-60 secondes que les bases de données démarrent.
 
 ```bash
+# Vérifier MongoDB
 docker-compose logs mongodb
+
+# Vérifier MySQL
+docker-compose logs mysql
 ```
 
 ### "Token invalide"

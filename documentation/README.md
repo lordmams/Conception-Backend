@@ -38,6 +38,12 @@ Bienvenue dans la documentation complète du projet Game API !
 - Restauration des données
 - Commandes pratiques
 
+**[MYSQL_SETUP.md](MYSQL_SETUP.md)** - Utiliser MySQL 🆕
+- Configuration MySQL
+- Schémas de base de données
+- Connexion depuis Node.js
+- Migration MongoDB → MySQL
+
 ---
 
 ## 📖 Documentation par compétence RNCP
@@ -89,8 +95,9 @@ Bienvenue dans la documentation complète du projet Game API !
 1. **[DEMARRAGE_RAPIDE.md](DEMARRAGE_RAPIDE.md)** - Premier contact avec l'API (5 min)
 2. **[README_PEDAGOGIQUE.md](README_PEDAGOGIQUE.md)** - Formation complète avec exercices
 3. **[ARBITRAGE_SQL_NOSQL.md](ARBITRAGE_SQL_NOSQL.md)** - Comprendre les choix de BDD
-4. **[TESTING.md](TESTING.md)** - Stratégie de tests complète
-5. **[BACKUP.md](BACKUP.md)** - Système de sauvegarde MongoDB
+4. **[MYSQL_SETUP.md](MYSQL_SETUP.md)** - 🆕 Utiliser MySQL dans le projet
+5. **[TESTING.md](TESTING.md)** - Stratégie de tests complète
+6. **[BACKUP.md](BACKUP.md)** - Système de sauvegarde MongoDB
 
 ---
 
@@ -98,7 +105,8 @@ Bienvenue dans la documentation complète du projet Game API !
 
 - 🏠 [Retour au README principal](../README.md)
 - 📊 [Swagger - Documentation interactive](http://localhost:3000)
-- 🗄️ [Mongo Express - Interface BDD](http://localhost:8082)
+- 🗄️ [Mongo Express - Interface MongoDB](http://localhost:8082)
+- 🐬 [phpMyAdmin - Interface MySQL](http://localhost:8083)
 - 🧪 [Collection Postman](../Game-API.postman_collection.json)
 
 ---

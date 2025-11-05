@@ -314,10 +314,12 @@ game-api/
 - ✅ **Documentation Swagger** interactive
 
 ### 🗄️ Base de données
-- ✅ **MongoDB** avec Mongoose
+- ✅ **Architecture hybride** : MongoDB (NoSQL) + MySQL (SQL)
+- ✅ **MongoDB** avec Mongoose pour les jeux
+- ✅ **MySQL** prêt pour les données relationnelles
 - ✅ **Index** pour la performance
-- ✅ **Sauvegardes automatiques** quotidiennes
-- ✅ **Restauration** facile des données
+- ✅ **Sauvegardes automatiques** MongoDB
+- ✅ **Interfaces graphiques** : Mongo Express + phpMyAdmin
 
 ### 🧪 Qualité
 - ✅ **Tests unitaires et d'intégration** avec Jest
@@ -341,6 +343,7 @@ game-api/
 - **[DEMARRAGE_RAPIDE.md](documentation/DEMARRAGE_RAPIDE.md)** - Guide de démarrage en 5 minutes
 
 ### 🔧 Documentation technique
+- **[MYSQL_SETUP.md](documentation/MYSQL_SETUP.md)** - 🆕 Configuration et utilisation de MySQL
 - **[BACKUP.md](documentation/BACKUP.md)** - Sauvegardes et restauration MongoDB
 - **[TESTING.md](documentation/TESTING.md)** - Tests unitaires, intégration et charge
 - **[env.example.txt](env.example.txt)** - Variables d'environnement
@@ -370,7 +373,8 @@ game-api/
 - **Documentation Swagger** : http://localhost:3000 (page d'accueil)
 - **Health Check** : http://localhost:3000/health
 - **API Games** : http://localhost:3000/api/games
-- **Mongo Express** : http://localhost:8082 (admin/admin123)
+- **Mongo Express (MongoDB)** : http://localhost:8082 (admin/admin123)
+- **phpMyAdmin (MySQL)** : http://localhost:8083 (root/root123)
 
 ---
 
@@ -408,12 +412,13 @@ Le guide pédagogique inclut des exercices de difficulté progressive :
 | Catégorie | Technologies |
 |-----------|--------------|
 | **Backend** | Node.js, Express, TypeScript |
-| **Base de données** | MongoDB, Mongoose |
+| **Base de données** | MongoDB (NoSQL), MySQL (SQL), Mongoose |
 | **Authentification** | JWT, bcryptjs |
 | **Sécurité** | Helmet, CORS, Rate limiting, Joi |
 | **Tests** | Jest, Supertest, MongoDB Memory Server |
 | **DevOps** | Docker, Docker Compose |
 | **Documentation** | Swagger/OpenAPI |
+| **Interfaces** | Mongo Express, phpMyAdmin |
 
 ---
 
